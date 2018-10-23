@@ -13,6 +13,7 @@ I use eager execution !!
 * Vanilla GAN
 * WGAN
 * SNGAN
+* PGGAN
 * Conditional GAN
 * ACGAN
 * cGANs with projection discriminator
