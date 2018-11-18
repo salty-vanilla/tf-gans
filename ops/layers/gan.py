@@ -29,7 +29,7 @@ class MiniBatchStddev(Layer):
         return _x
 
     def compute_output_shape(self, input_shape):
-        return *input_shape[:3], input_shape[3]+1
+        return (*input_shape[:3], input_shape[3]+1)
 
 
 class MiniBatchDiscrimination(Layer):
