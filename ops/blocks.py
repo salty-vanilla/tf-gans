@@ -1,5 +1,6 @@
 import tensorflow as tf
 from ops.layers.activations import activation
+from ops.layers.conv import SubPixelConv2D
 
 
 class ConvBlock(tf.keras.Model):
@@ -37,7 +38,11 @@ class ConvBlock(tf.keras.Model):
                                                         activation=None,
                                                         **conv_params)
         elif sampling == 'subpixel':
-            raise NotImplementedError
+            self.conv = SubPixelConv2D(filters,
+                                       rate=2,
+                                       kernel_size=kernel_size,
+                                       activation=None,
+                                       **conv_params)
         else:
             raise ValueError
 
