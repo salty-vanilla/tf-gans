@@ -1,6 +1,7 @@
 import tensorflow as tf
 from ops.layers.activations import activation
 from ops.layers.conv import SubPixelConv2D
+from ops.layers.normalizations import *
 
 
 class ConvBlock(tf.keras.Model):
@@ -51,7 +52,11 @@ class ConvBlock(tf.keras.Model):
             if normalization == 'batch':
                 self.norm = tf.keras.layers.BatchNormalization()
             elif normalization == 'layer':
-                raise NotImplementedError
+                self.norm = LayerNorm()
+            elif normalization == 'instance':
+                self.norm = InstanceNorm()
+            elif normalization == 'pixel':
+                self.norm = PixelNorm()
             else:
                 raise ValueError
         else:
@@ -83,7 +88,11 @@ class DenseBlock(tf.keras.Model):
             if normalization == 'batch':
                 self.norm = tf.keras.layers.BatchNormalization()
             elif normalization == 'layer':
-                raise NotImplementedError
+                self.norm = LayerNorm()
+            elif normalization == 'instance':
+                self.norm = None
+            elif normalization == 'pixel':
+                self.norm = None
             else:
                 raise ValueError
         else:
