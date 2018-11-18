@@ -15,9 +15,11 @@ class ConvBlock(tf.keras.Model):
         conv_params.setdefault('padding', 'same')
         super().__init__()
 
-        assert sampling in ['deconv', 'up', 'stride', 'max_pool', 'avg_pool', 'same']
-
-        stride = 1 if sampling in ['same', 'subpixel', 'max_pool', 'avg_pool', ] \
+        stride = 1 if sampling in ['same',
+                                   'subpixel',
+                                   'max_pool',
+                                   'avg_pool',
+                                   'subpixel'] \
             else 2
         if 'stride' in conv_params:
             stride = conv_params['stride']
