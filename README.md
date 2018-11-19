@@ -8,9 +8,9 @@ Major GANs are implemented in this repository :fire:
 I use eager execution !!
 
 ## Implemented
+* [Vanilla GAN](https://github.com/salty-vanilla/tf-gans/tree/master/impl/vanilla_gan)
 
 ## To Implement
-* Vanilla GAN
 * WGAN
 * SNGAN
 * PGGAN
