@@ -1,18 +1,18 @@
-logdir: ../../../logs/wgan/mnist/debug2
+logdir: ../../../logs/wgan/mnist/debug6
 
 generator_params:
   latent_dim: 128
   upsampling: deconv
   normalization: batch
-  nb_filter: 16
+  nb_filter: 32
 
 discriminator_params:
   normalization: batch
-  nb_filter: 16
+  nb_filter: 32
 
 solver_params:
-  lr_g: 0.001
-  lr_d: 0.001
+  lr_g: 0.0001
+  lr_d: 0.0003
 
 fit_params:
   batch_size: 64

@@ -17,9 +17,10 @@ class Discriminator(D):
         self.convs = []
         for i in range(4):
             _nb_filter = nb_filter*(2**i)
+            # self.convs.append(ConvBlock(_nb_filter,
+            #                             **self.conv_block_params))
             self.convs.append(ConvBlock(_nb_filter,
-                                        **self.conv_block_params))
-            self.convs.append(ConvBlock(_nb_filter,
+                                        kernel_size=(5, 5),
                                         sampling=downsampling,
                                         **self.conv_block_params))
         self.dense = tf.layers.Dense(1)
