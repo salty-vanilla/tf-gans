@@ -1,8 +1,6 @@
-# Vanilla GAN
-Generative Adversarial Nets
-[[paper]](https://papers.nips.cc/paper/5423-generative-adversarial-nets)  
-Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks
-[[paper]](https://arxiv.org/abs/1511.06434)  
+# WGAN-GP
+Improved Training of Wasserstein GANs
+[[paper]](https://arxiv.org/abs/1704.00028)  
 
 ## Environments
 * python 3.6
