@@ -82,3 +82,61 @@ class LayerNorm(tf.keras.layers.Layer):
 
     def compute_output_shape(self, input_shape):
         return input_shape
+
+
+class SpectralNorm(tf.keras.layers.Layer):
+    def __init__(self, layer,
+                 power_iteration=1,
+                 initializer=tf.keras.initializers.TruncatedNormal(stddev=0.2)):
+        super().__init__()
+        self.layer = layer
+        self.power_iteration = power_iteration
+        self.initializer = initializer
+
+    def build(self, input_shape):
+        if hasattr(self.layer, 'filters'):
+            d = self.layer.filters
+        elif hasattr(self.layer, 'units'):
+            d = self.layer.units
+        else:
+            raise AttributeError
+        self.u = self.add_variable(shape=(1, d),
+                                   name='u',
+                                   initializer=self.initializer,
+                                   trainable=False)
+
+    def call(self, inputs,
+             training=None,
+             **kwargs):
+        if training:
+            w = self.layer.kernel
+            w_shape = w.shape.as_list()
+            w = tf.reshape(w, (-1, w_shape[-1]))
+
+            u_hat = self.u
+            v_hat = None
+
+            for i in range(self.power_iteration):
+                v_ = tf.matmul(u_hat, w, transpose_b=True)
+                v_hat = tf.nn.l2_normalize(v_)
+
+                u_ = tf.matmul(v_hat, w)
+                u_hat = tf.nn.l2_normalize(u_)
+
+            u_hat = tf.stop_gradient(u_hat)
+            v_hat = tf.stop_gradient(v_hat)
+
+            sigma = tf.matmul(tf.matmul(v_hat, w), u_hat, transpose_b=True)
+
+            w_norm = w / sigma
+            w_norm = tf.reshape(w_norm, w_shape)
+
+            tf.assign(self.u, u_hat)
+            tf.assign(self.layer.kernel, w_norm)
+
+        else:
+            pass
+        return self.layer(inputs, **kwargs)
+
+    def compute_output_shape(self, input_shape):
+        return input_shape

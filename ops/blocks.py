@@ -11,6 +11,7 @@ class ConvBlock(tf.keras.Model):
                  dilation_rate=(1, 1),
                  sampling='same',
                  normalization=None,
+                 spectral_norm=False,
                  **conv_params):
         conv_params.setdefault('padding', 'same')
         super().__init__()
@@ -49,6 +50,9 @@ class ConvBlock(tf.keras.Model):
         else:
             raise ValueError
 
+        if spectral_norm:
+            self.conv = SpectralNorm(self.conv)
+
         # Normalization
         if normalization is not None:
             if normalization == 'batch':
@@ -80,10 +84,14 @@ class DenseBlock(tf.keras.Model):
     def __init__(self, units,
                  activation_=None,
                  normalization=None,
+                 spectral_norm=False,
                  **dense_params):
         super().__init__()
         self.units = units
         self.dense = tf.keras.layers.Dense(units, **dense_params)
+
+        if spectral_norm:
+            self.dense = SpectralNorm(self.dense)
 
         # Normalization
         if normalization is not None:

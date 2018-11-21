@@ -1,0 +1,20 @@
+logdir: ../../../logs/sngan/mnist/debug
+
+generator_params:
+  latent_dim: 128
+  upsampling: deconv
+  normalization: batch
+  nb_filter: 32
+
+discriminator_params:
+  normalization: batch
+  nb_filter: 32
+
+solver_params:
+  lr_g: 0.0001
+  lr_d: 0.0003
+
+fit_params:
+  batch_size: 64
+  nb_epoch: 100
+  save_steps: 100

@@ -16,9 +16,9 @@ I use eager execution !!
 * [Vanilla GAN](https://github.com/salty-vanilla/tf-gans/tree/master/impl/vanilla_gan)
 * [WGAN](https://github.com/salty-vanilla/tf-gans/tree/master/impl/wgan)
 * [WGAN-GP](https://github.com/salty-vanilla/tf-gans/tree/master/impl/wgan_gp)
+* [SNGAN](https://github.com/salty-vanilla/tf-gans/tree/master/impl/sngan)
 
 ## To Implement
-* SNGAN
 * PGGAN
 * Conditional GAN
 * ACGAN
@@ -31,7 +31,7 @@ I use eager execution !!
 | Vanilla GAN | <img src="impl/vanilla_gan/assets/mnist.png"> | TBA | TBA |
 | WGAN | <img src="impl/wgan/assets/mnist.png"> | TBA | TBA |
 | WGAN-GP | <img src="impl/wgan_gp/assets/mnist.png"> | TBA | TBA |
-| SNGAN | TBA | TBA | TBA |
+| SNGAN | <img src="impl/sngan/assets/mnist.png"> | TBA | TBA |
 | PGGAN | TBA | TBA | TBA |
 | Conditional GAN | TBA | TBA | TBA |
 | ACGAN | TBA | TBA | TBA |
