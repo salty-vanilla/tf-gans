@@ -13,11 +13,13 @@ class FirstGeneratorBlock(tf.keras.Model):
         self.conv1 = ConvBlock(filters,
                                sampling='same',
                                normalization=normalization,
-                               activation_=activation_)
+                               activation_=activation_,
+                               lr_equalization=True)
         self.conv2 = ConvBlock(filters,
                                sampling='same',
                                normalization=normalization,
-                               activation_=activation_)
+                               activation_=activation_,
+                               lr_equalization=True)
 
     def call(self, inputs,
              training=None,
@@ -38,15 +40,18 @@ class GeneratorBlock(tf.keras.Model):
         self.up = ConvBlock(filters,
                             sampling=upsampling,
                             normalization=normalization,
-                            activation_=activation_)
+                            activation_=activation_,
+                            lr_equalization=True)
         self.conv1 = ConvBlock(filters,
                                sampling='same',
                                normalization=normalization,
-                               activation_=activation_)
+                               activation_=activation_,
+                               lr_equalization=True)
         self.conv2 = ConvBlock(filters,
                                sampling='same',
                                normalization=normalization,
-                               activation_=activation_)
+                               activation_=activation_,
+                               lr_equalization=True)
 
     def call(self, inputs,
              training=None,
@@ -77,11 +82,13 @@ class DiscriminatorBlock(tf.keras.Model):
         self.conv1 = ConvBlock(filters,
                                sampling='same',
                                normalization=normalization,
-                               activation_=activation_)
+                               activation_=activation_,
+                               lr_equalization=True)
         self.conv2 = ConvBlock(filters,
                                sampling=downsampling,
                                normalization=normalization,
-                               activation_=activation_)
+                               activation_=activation_,
+                               lr_equalization=True)
 
     def call(self, inputs,
              training=None,
@@ -99,13 +106,15 @@ class LastDiscriminatorBlock(tf.keras.Model):
         self.conv1 = ConvBlock(filters,
                                sampling='same',
                                normalization=normalization,
-                               activation_=activation_)
+                               activation_=activation_,
+                               lr_equalization=True)
         self.conv2 = ConvBlock(filters,
                                kernel_size=(4, 4),
                                sampling='same',
                                padding='valid',
                                normalization='layer',
-                               activation_=activation_)
+                               activation_=activation_,
+                               lr_equalization=True)
 
     def call(self, inputs,
              training=None,
@@ -113,3 +122,19 @@ class LastDiscriminatorBlock(tf.keras.Model):
         x = self.mb_stddev(inputs)
         x = self.conv1(x, training=training)
         return self.conv2(x, training=training)
+
+
+class FromRGB(tf.keras.Model):
+    def __init__(self, filters,
+                 normalization='instance',
+                 activation_='lrelu'):
+        super().__init__()
+        self.conv = ConvBlock(filters,
+                              sampling='same',
+                              normalization=normalization,
+                              activation_=activation_)
+
+    def call(self, inputs,
+             training=None,
+             mask=None):
+        return self.conv(inputs, training=training)
