@@ -2,6 +2,7 @@ import tensorflow as tf
 from ops.layers.activations import activation
 from ops.layers.conv import SubPixelConv2D
 from ops.layers.normalizations import *
+from ops.layers.gan import LearningRateEqualizer
 
 
 class ConvBlock(tf.keras.Model):
@@ -12,6 +13,7 @@ class ConvBlock(tf.keras.Model):
                  sampling='same',
                  normalization=None,
                  spectral_norm=False,
+                 lr_equalization=False,
                  **conv_params):
         conv_params.setdefault('padding', 'same')
         super().__init__()
@@ -53,6 +55,9 @@ class ConvBlock(tf.keras.Model):
         if spectral_norm:
             self.conv = SpectralNorm(self.conv)
 
+        if lr_equalization:
+            self.conv = LearningRateEqualizer(self.conv)
+
         # Normalization
         if normalization is not None:
             if normalization == 'batch':
@@ -70,10 +75,15 @@ class ConvBlock(tf.keras.Model):
 
         self.act = activation_
 
+        self.is_feed_training = spectral_norm or lr_equalization
+
     def call(self, inputs,
              training=None,
              mask=None):
-        x = self.conv(inputs)
+        if self.is_feed_training:
+            x = self.conv(inputs, training=training)
+        else:
+            x = self.conv(inputs)
         if self.norm is not None:
             x = self.norm(x, training=training)
         x = activation(x, self.act)
@@ -85,6 +95,7 @@ class DenseBlock(tf.keras.Model):
                  activation_=None,
                  normalization=None,
                  spectral_norm=False,
+                 lr_equalization=False,
                  **dense_params):
         super().__init__()
         self.units = units
@@ -92,6 +103,9 @@ class DenseBlock(tf.keras.Model):
 
         if spectral_norm:
             self.dense = SpectralNorm(self.dense)
+
+        if lr_equalization:
+            self.dense = LearningRateEqualizer(self.dense)
 
         # Normalization
         if normalization is not None:
@@ -110,10 +124,15 @@ class DenseBlock(tf.keras.Model):
 
         self.act = activation_
 
+        self.is_feed_training = spectral_norm or lr_equalization
+
     def call(self, inputs,
              training=None,
              mask=None):
-        x = self.dense(inputs)
+        if self.is_feed_training:
+            x = self.dense(inputs, training=training)
+        else:
+            x = self.dense(inputs)
         if self.norm is not None:
             x = self.norm(x, training=training)
         x = activation(x, self.act)

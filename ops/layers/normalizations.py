@@ -92,6 +92,7 @@ class SpectralNorm(tf.keras.layers.Layer):
         self.layer = layer
         self.power_iteration = power_iteration
         self.initializer = initializer
+        self._is_set = False
 
     def build(self, input_shape):
         if hasattr(self.layer, 'filters'):
@@ -109,6 +110,10 @@ class SpectralNorm(tf.keras.layers.Layer):
              training=None,
              **kwargs):
         if training:
+            if not self._is_set:
+                self.layer(inputs)
+                self._is_set = True
+
             w = self.layer.kernel
             w_shape = w.shape.as_list()
             w = tf.reshape(w, (-1, w_shape[-1]))
@@ -133,7 +138,6 @@ class SpectralNorm(tf.keras.layers.Layer):
 
             tf.assign(self.u, u_hat)
             tf.assign(self.layer.kernel, w_norm)
-
         else:
             pass
         return self.layer(inputs, **kwargs)
