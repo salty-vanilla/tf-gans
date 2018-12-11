@@ -3,12 +3,16 @@ import tensorflow as tf
 
 def generator_loss(d_fake,
                    metrics='JSD'):
-    if metrics == 'JSD':
+    if metrics in ['JSD', 'jsd']:
         return tf.reduce_mean(
             tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.ones_like(d_fake),
                                                     logits=d_fake))
-    elif metrics == 'WD':
+    elif metrics in ['WD', 'wd']:
         return -tf.reduce_mean(d_fake)
+    elif metrics in ['HINGE', 'hinge']:
+        return -tf.reduce_mean(d_fake)
+    elif metrics in ['LS', 'ls', 'PearsonChiSquared', 'PCS', 'pcs']:
+        return tf.reduce_mean((d_fake-1)**2)/2
     else:
         raise ValueError
 
@@ -16,7 +20,7 @@ def generator_loss(d_fake,
 def discriminator_loss(d_real,
                        d_fake,
                        metrics='JSD'):
-    if metrics == 'JSD':
+    if metrics in ['JSD', 'jsd']:
         real_loss = tf.reduce_mean(
             tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.ones_like(d_real),
                                                     logits=d_real))
@@ -24,8 +28,14 @@ def discriminator_loss(d_real,
             tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.zeros_like(d_fake),
                                                     logits=d_fake))
         return real_loss + fake_loss
-    elif metrics == 'WD':
+    elif metrics in ['WD', 'wd']:
         return -(tf.reduce_mean(d_real) - tf.reduce_mean(d_fake))
+    elif metrics in ['HINGE', 'hinge']:
+        real_loss = -tf.reduce_mean(tf.minimum(0, -1 + d_real))
+        fake_loss = -tf.reduce_mean(tf.minimum(0, -1 - d_fake))
+        return real_loss + fake_loss
+    elif metrics in ['LS', 'ls', 'PearsonChiSquared', 'PCS', 'pcs']:
+        return tf.reduce_mean((d_real-1)**2)/2 + tf.reduce_mean((d_fake-0)**2)/2
     else:
         raise ValueError
 
