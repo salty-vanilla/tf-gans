@@ -150,25 +150,3 @@ def get_image_paths(src_dir):
 
     return [path for path in get_all_paths() if is_image(path)]
 
-
-def main():
-    import pickle
-    path = '/home/nakatsuka/workspace/dataset/johoken/insert_molding/insert_molding.pkl.gz'
-    with open(path, 'rb') as f:
-        ((train_x, train_y), (test_x, test_y)) = pickle.load(f)
-
-    im = ImageSampler()
-    ii = im.flow(train_x)
-
-    x = ii()[0]
-
-    import matplotlib
-    matplotlib.use('agg')
-    import matplotlib.pyplot as plt
-
-    plt.plot(np.arange(len(x)), x)
-    plt.savefig('temp.png')
-
-
-if __name__ == '__main__':
-    main()
