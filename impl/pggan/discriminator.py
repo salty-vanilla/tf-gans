@@ -38,16 +38,22 @@ class Discriminator(tf.keras.Model):
              growing_step: int=None,
              alpha: float=1.):
         assert isinstance(growing_step, int)
+        is_blend = alpha != 1. and growing_step != 0
+
+        if growing_step > 1:
+            self.from_rgbs[growing_step - 2].trainable = False
+
+        if not is_blend:
+            self.from_rgbs[growing_step-1].trainable = False
 
         x = inputs
-        is_blend = alpha != 1. and growing_step != 0
         if is_blend:
             _x = tf.keras.layers.AveragePooling2D((2, 2))(x)
-            _x = self.from_rgbs[growing_step-1](_x)
+            _x = self.from_rgbs[growing_step-1](_x, training=training)
 
-        x = self.from_rgbs[growing_step](x)
+        x = self.from_rgbs[growing_step](x, training=training)
         for i in range(growing_step+1)[::-1]:
-            x = self.blocks[i](x)
+            x = self.blocks[i](x, training=training)
 
             if is_blend and i == growing_step:
                 x = alpha*x + (1.-alpha)*_x

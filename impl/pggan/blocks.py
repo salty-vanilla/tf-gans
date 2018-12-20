@@ -65,12 +65,13 @@ class ToRGB(tf.keras.Model):
     def __init__(self):
         super().__init__()
         self.conv = ConvBlock(3,
-                              activation_='tanh')
+                              activation_='tanh',
+                              lr_equalization=True)
 
     def call(self, inputs,
              training=None,
              mask=None):
-        return self.conv(inputs)
+        return self.conv(inputs, training=training)
 
 
 class DiscriminatorBlock(tf.keras.Model):
@@ -132,7 +133,8 @@ class FromRGB(tf.keras.Model):
         self.conv = ConvBlock(filters,
                               sampling='same',
                               normalization=normalization,
-                              activation_=activation_)
+                              activation_=activation_,
+                              lr_equalization=True)
 
     def call(self, inputs,
              training=None,
