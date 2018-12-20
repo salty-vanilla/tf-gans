@@ -64,25 +64,22 @@ class LearningRateEqualizer(tf.keras.layers.Layer):
     def __init__(self, layer):
         super().__init__(layer)
         self.layer = layer
-        self._is_set = False
+        self.scale = None
 
     def call(self,
              inputs,
              training=None,
              **kwargs):
         if training:
-            if not self._is_set:
+            if self.scale is None:
                 self.layer(inputs)
-                self._is_set = True
-                c = np.array(tf.reduce_mean(self.layer.kernel**2)**0.5)
+                c = np.array((tf.reduce_mean(self.layer.kernel**2))**0.5)
                 self.scale = self.add_variable(name='scale',
                                                shape=(),
                                                initializer=tf.keras.initializers.Constant(c),
                                                trainable=False)
-            tf.assign(self.layer.kernel, self.layer.kernel/self.scale)
-        else:
-            pass
-        return self.layer(inputs, **kwargs)
+                tf.assign(self.layer.kernel, self.layer.kernel/self.scale)
+        return self.layer(inputs*self.scale, **kwargs)
 
     def compute_output_shape(self, input_shape):
         return input_shape
