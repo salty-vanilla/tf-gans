@@ -1,0 +1,45 @@
+logdir: ../../../logs/pggan/mnist/debug2
+records:
+  - /home/nakatsuka/workspace/dataset/safebooru/safebooru.tfrecord
+
+generator_params:
+  latent_dim: 512
+  upsampling: subpixel
+  normalization: pixel
+
+discriminator_params:
+  normalization: instance
+
+solver_params:
+  lr_g: 0.0001
+  lr_d: 0.0003
+  nb_growing: 7
+
+fit_params:
+  batch_size:
+    - 64
+    - 64
+    - 32
+    - 32
+    - 10
+    - 4
+    - 2
+  nb_epoch:
+    - 20
+    - 20
+    - 30
+    - 30
+    - 40
+    - 40
+    - 50
+  nb_visualize:
+    - 256
+    - 256
+    - 64
+    - 64
+    - 16
+    - 16
+    - 16
+
+  save_steps: 10
+  visualize_steps: 1
