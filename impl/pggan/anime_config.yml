@@ -1,31 +1,32 @@
-logdir: ../../../logs/pggan/mnist/debug2
+logdir: ../../../logs/pggan/anime/debug
 records:
   - /home/nakatsuka/workspace/dataset/safebooru/safebooru.tfrecord
 
 generator_params:
   latent_dim: 512
-  upsampling: subpixel
+  upsampling: up
   normalization: pixel
 
 discriminator_params:
   normalization: instance
+  downsampling: avg_pool
 
 solver_params:
-  lr_g: 0.0001
-  lr_d: 0.0003
+  lr_g: 0.001
+  lr_d: 0.003
   nb_growing: 7
 
 fit_params:
   batch_size:
-    - 64
+    - 512
+    - 256
+    - 128
     - 64
     - 32
-    - 32
-    - 10
-    - 4
-    - 2
+    - 16
+    - 8
   nb_epoch:
-    - 20
+    - 10
     - 20
     - 30
     - 30
@@ -37,8 +38,8 @@ fit_params:
     - 256
     - 64
     - 64
-    - 16
-    - 16
+    - 64
+    - 64
     - 16
 
   save_steps: 10
