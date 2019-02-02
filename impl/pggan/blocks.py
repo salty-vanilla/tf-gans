@@ -37,11 +37,19 @@ class GeneratorBlock(tf.keras.Model):
                  upsampling='subpixel',
                  activation_='lrelu'):
         super().__init__()
-        self.up = ConvBlock(filters,
-                            sampling=upsampling,
-                            normalization=normalization,
-                            activation_=activation_,
-                            lr_equalization=True)
+        if upsampling in ['subpixel', 'deconv']:
+            self.up = ConvBlock(filters,
+                                sampling=upsampling,
+                                normalization=normalization,
+                                activation_=activation_,
+                                lr_equalization=True)
+            self.feed_training = True
+        elif upsampling == 'up':
+            self.up = tf.keras.layers.UpSampling2D()
+            self.feed_training = False
+        else:
+            raise ValueError
+
         self.conv1 = ConvBlock(filters,
                                sampling='same',
                                normalization=normalization,
@@ -56,7 +64,10 @@ class GeneratorBlock(tf.keras.Model):
     def call(self, inputs,
              training=None,
              mask=None):
-        x = self.up(inputs, training=training)
+        if self.feed_training:
+            x = self.up(inputs, training=training)
+        else:
+            x = self.up(inputs)
         x = self.conv1(x, training=training)
         return self.conv2(x, training=training)
 
@@ -65,6 +76,7 @@ class ToRGB(tf.keras.Model):
     def __init__(self):
         super().__init__()
         self.conv = ConvBlock(3,
+                              kernel_size=(1, 1),
                               activation_='tanh',
                               lr_equalization=True)
 
@@ -131,6 +143,7 @@ class FromRGB(tf.keras.Model):
                  activation_='lrelu'):
         super().__init__()
         self.conv = ConvBlock(filters,
+                              kernel_size=(1, 1),
                               sampling='same',
                               normalization=normalization,
                               activation_=activation_,

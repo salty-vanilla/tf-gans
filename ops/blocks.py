@@ -75,6 +75,13 @@ class ConvBlock(tf.keras.Model):
 
         self.act = activation_
 
+        if sampling == 'max_pool':
+            self.pool = tf.keras.layers.MaxPool2D()
+        elif sampling == 'avg_pool':
+            self.pool = tf.keras.layers.AveragePooling2D()
+        else:
+            self.pool = None
+
         self.is_feed_training = spectral_norm or lr_equalization
 
     def call(self, inputs,
@@ -87,6 +94,8 @@ class ConvBlock(tf.keras.Model):
         if self.norm is not None:
             x = self.norm(x, training=training)
         x = activation(x, self.act)
+        if self.pool is not None:
+            x = self.pool(x)
         return x
 
 

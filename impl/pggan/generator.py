@@ -10,7 +10,7 @@ class Generator(tf.keras.Model):
                  activation_='lrelu'):
         super().__init__()
         self.latent_dim = latent_dim
-        self.filters = [512, 512, 512, 512, 256, 256, 128, 64, 32][:nb_growing]
+        self.filters = [512, 512, 256, 128, 64, 32, 16, 8, 8][:nb_growing]
 
         self.blocks = []
         self.to_rgbs = []

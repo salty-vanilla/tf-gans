@@ -139,7 +139,7 @@ class Solver(object):
 
             alpha = float(self.initial_alpha)
             delta = self.delta if self.delta is not None \
-                else 5. / nb_epoch[growing_step] / (len(image_sampler) // image_sampler.batch_size)
+                else 2. / nb_epoch[growing_step] / (len(image_sampler) // image_sampler.batch_size)
 
             # calc steps_per_epoch
             steps_per_epoch = nb_sample // image_sampler.batch_size
@@ -165,9 +165,9 @@ class Solver(object):
                     z = tf.constant(z, dtype=tf.float32)
                     loss_g = self._update_generator(z, alpha, growing_step)
 
-                    print('iter : {} / {}  {:.1f}[s]  loss_d : {:.4f}  loss_g : {:.4f}\r'
+                    print('iter : {} / {}  {:.1f}[s]  loss_d : {:.4f}  loss_g : {:.4f}  alpha : {:.4f}\r'
                           .format(iter_, steps_per_epoch, time.time() - start,
-                                  loss_d, loss_g), end='')
+                                  loss_d, loss_g, alpha), end='')
 
                     alpha += delta
                     alpha = np.minimum(alpha, 1.)

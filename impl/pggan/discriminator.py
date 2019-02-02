@@ -11,7 +11,7 @@ class Discriminator(tf.keras.Model):
                  normalization='instance',
                  activation_='lrelu'):
         super().__init__()
-        self.filters = [512, 512, 512, 512, 256, 256, 128, 64, 32][:nb_growing]
+        self.filters = [512, 512, 256, 128, 64, 32, 16, 8, 8][:nb_growing]
 
         self.blocks = []
         self.from_rgbs = []
