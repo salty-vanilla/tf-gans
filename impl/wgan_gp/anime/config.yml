@@ -1,0 +1,22 @@
+logdir: ../../../logs/wgan_gp/anime/debug_2
+records:
+  - /home/nakatsuka/workspace/dataset/safebooru/safebooru.tfrecord
+batch_size: 64
+
+generator_params:
+  latent_dim: 128
+  upsampling: subpixel
+  normalization: batch
+  nb_filter: 128
+
+discriminator_params:
+  normalization: instance
+  nb_filter: 32
+
+solver_params:
+  lr_g: 0.0001
+  lr_d: 0.0003
+
+fit_params:
+  nb_epoch: 100
+  save_steps: 100
