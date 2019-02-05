@@ -79,7 +79,7 @@ class Solver(object):
                       visualize_steps=1,
                       save_steps=1):
         batch_size = image_sampler.batch_size
-        nb_sample = image_sampler.nb_sample
+        nb_sample = len(image_sampler)
 
         # calc steps_per_epoch
         steps_per_epoch = nb_sample // batch_size
@@ -121,7 +121,7 @@ class Solver(object):
         dst_path = os.path.join(self.logdir, 'image', 'epoch_%d.png' % epoch)
         os.makedirs(os.path.dirname(dst_path), exist_ok=True)
         outputs = self.generator(z, training=True)
-        outputs = np.array(outputs)
+        # outputs = np.array(outputs)
         outputs = data_to_image(outputs)
         n, h, w, c = outputs.shape
         n_sq = int(np.sqrt(n))
