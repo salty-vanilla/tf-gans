@@ -11,3 +11,4 @@ Improved Training of Wasserstein GANs
 
 ### Generated samples
 <img src="assets/mnist.png">
+<img src="assets/anime.png">

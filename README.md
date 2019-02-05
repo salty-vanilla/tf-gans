@@ -30,7 +30,7 @@ I use eager execution !!
 |-|-|-|-|
 | Vanilla GAN | <img src="impl/vanilla_gan/assets/mnist.png"> | TBA | TBA |
 | WGAN | <img src="impl/wgan/assets/mnist.png"> | TBA | TBA |
-| WGAN-GP | <img src="impl/wgan_gp/assets/mnist.png"> | TBA | TBA |
+| WGAN-GP | <img src="impl/wgan_gp/assets/mnist.png"> | TBA | <img src="impl/wgan_gp/assets/anime.png"> |
 | SNGAN | <img src="impl/sngan/assets/mnist.png"> | TBA | TBA |
 | PGGAN | TBA | TBA | <img src="impl/pggan/assets/anime.png"> |
 | Conditional GAN | TBA | TBA | TBA |
