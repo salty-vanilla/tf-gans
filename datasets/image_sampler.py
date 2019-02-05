@@ -132,6 +132,7 @@ class DirectoryIterator(Iterator):
             yield image_batch
 
     def data_to_image(self, x):
+        x = np.array(x)
         if x.shape[-1] == 1:
             x = x.reshape(x.shape[:-1])
         return denormalize(x, self.normalize_mode)
@@ -204,6 +205,7 @@ class ArrayIterator(Iterator):
                 yield image_batch
 
     def data_to_image(self, x):
+        x = np.array(x)
         if x.shape[-1] == 1:
             x = x.reshape(x.shape[:-1])
         return denormalize(x, self.normalize_mode)
