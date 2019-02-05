@@ -146,3 +146,62 @@ class DenseBlock(tf.keras.Model):
             x = self.norm(x, training=training)
         x = activation(x, self.act)
         return x
+
+
+class ResidualBlock(tf.keras.Model):
+    def __init__(self, filters,
+                 kernel_size=(3, 3),
+                 activation_=None,
+                 dilation_rate=(1, 1),
+                 sampling='same',
+                 normalization=None,
+                 spectral_norm=False,
+                 lr_equalization=False,
+                 **conv_params):
+        super().__init__()
+        self.conv1 = ConvBlock(filters,
+                               kernel_size,
+                               activation_,
+                               dilation_rate,
+                               sampling,
+                               normalization,
+                               spectral_norm,
+                               lr_equalization,
+                               **conv_params)
+        self.conv2 = ConvBlock(filters,
+                               kernel_size,
+                               None,
+                               dilation_rate,
+                               sampling,
+                               None,
+                               spectral_norm,
+                               lr_equalization,
+                               **conv_params)
+
+        # Normalization
+        if normalization is not None:
+            if normalization == 'batch':
+                self.norm = tf.keras.layers.BatchNormalization()
+            elif normalization == 'layer':
+                self.norm = LayerNorm()
+            elif normalization == 'instance':
+                self.norm = InstanceNorm()
+            elif normalization == 'pixel':
+                self.norm = PixelNorm()
+            else:
+                raise ValueError
+        else:
+            self.norm = None
+
+        self.act = activation_
+
+    def call(self, inputs,
+             training=None,
+             mask=None):
+        x = self.conv1(inputs, training=training)
+        x = self.conv2(x, training=training)
+        x += inputs
+        if self.norm is not None:
+            x = self.norm(x, training=training)
+        x = activation(x, self.act)
+        return x
