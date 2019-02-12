@@ -130,7 +130,7 @@ class AnimeResidualDiscriminator(Discriminator):
                          downsampling,
                          spectral_norm)
         self.convs = []
-        nb_convs = [1, 2, 2, 2, 2, 2]
+        nb_convs = [1, 2, 2, 2, 2]
 
         for block_idx, nb_conv in enumerate(nb_convs):
             _nb_filter = nb_filter*(2**block_idx)
