@@ -17,7 +17,6 @@ class ConvBlock(tf.keras.Model):
                  **conv_params):
         conv_params.setdefault('padding', 'same')
         super().__init__()
-
         stride = 1 if sampling in ['same',
                                    'subpixel',
                                    'max_pool',
@@ -82,15 +81,23 @@ class ConvBlock(tf.keras.Model):
         else:
             self.pool = None
 
+        if sampling == 'up':
+            self.up = tf.keras.layers.UpSampling2D()
+        else:
+            self.up = None
+
         self.is_feed_training = spectral_norm or lr_equalization
 
     def call(self, inputs,
              training=None,
              mask=None):
+        x = inputs
+        if self.up is not None:
+            x = self.up(x)
         if self.is_feed_training:
-            x = self.conv(inputs, training=training)
+            x = self.conv(x, training=training)
         else:
-            x = self.conv(inputs)
+            x = self.conv(x)
         if self.norm is not None:
             x = self.norm(x, training=training)
         x = activation(x, self.act)
@@ -159,11 +166,13 @@ class ResidualBlock(tf.keras.Model):
                  lr_equalization=False,
                  **conv_params):
         super().__init__()
+        self.filters = filters
+        self.sampling = sampling
         self.conv1 = ConvBlock(filters,
                                kernel_size,
                                activation_,
                                dilation_rate,
-                               sampling,
+                               'same',
                                normalization,
                                spectral_norm,
                                lr_equalization,
@@ -194,14 +203,28 @@ class ResidualBlock(tf.keras.Model):
             self.norm = None
 
         self.act = activation_
+        self.shortcut_conv = tf.keras.layers.Conv2D(filters, (1, 1))
 
     def call(self, inputs,
              training=None,
              mask=None):
         x = self.conv1(inputs, training=training)
         x = self.conv2(x, training=training)
-        x += inputs
+
+        if inputs.get_shape().as_list()[-1] != self.filters:
+            x += self.shortcut(self.shortcut_conv(inputs))
+        else:
+            x += self.shortcut(inputs)
+
         if self.norm is not None:
             x = self.norm(x, training=training)
         x = activation(x, self.act)
         return x
+
+    def shortcut(self, x):
+        if self.sampling in ['deconv', 'up', 'subpixel']:
+            return tf.keras.layers.UpSampling2D()(x)
+        elif self.sampling in ['max_pool', 'avg_pool', 'stride']:
+            return tf.keras.layers.AveragePooling2D()(x)
+        else:
+            return x
