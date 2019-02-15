@@ -19,7 +19,7 @@ class Generator(tf.keras.Model):
         self.feature_shape = None
 
         self.conv_block_params = {'kernel_initializer': 'he_normal',
-                                  'activation_': 'lrelu',
+                                  'activation_': 'relu',
                                   'normalization': self.normalization,
                                   'spectral_norm': self.spectral_norm}
 
