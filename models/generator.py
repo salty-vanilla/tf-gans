@@ -19,7 +19,7 @@ class MNISTGenerator(Generator):
 
         self.convs = []
         self.dense = DenseBlock(4*4*nb_filter*(2**3),
-                                activation_='lrelu',
+                                activation_='relu',
                                 normalization=normalization,
                                 spectral_norm=spectral_norm)
 
@@ -63,24 +63,20 @@ class AnimeGenerator64(Generator):
 
         self.convs = []
         self.dense = DenseBlock(4*4*nb_filter*(2**4),
-                                activation_='lrelu',
+                                activation_='relu',
                                 normalization=normalization,
                                 spectral_norm=spectral_norm)
 
         for i in range(1, 5):
             _nb_filter = nb_filter*(2**(4-i))
-            self.convs.append(ConvBlock(_nb_filter,
-                                        kernel_size=(3, 3),
-                                        sampling='same',
-                                        **self.conv_block_params))
             if upsampling == 'subpixel':
                 _nb_filter *= 4
             self.convs.append(ConvBlock(_nb_filter,
-                                        kernel_size=(3, 3),
+                                        kernel_size=(5, 5),
                                         sampling=upsampling,
                                         **self.conv_block_params))
         self.last_conv = ConvBlock(3,
-                                   kernel_size=(1, 1),
+                                   kernel_size=(7, 7),
                                    **self.last_conv_block_params)
 
     def call(self, inputs,
@@ -110,24 +106,20 @@ class AnimeGenerator128(Generator):
 
         self.convs = []
         self.dense = DenseBlock(4*4*nb_filter*(2**5),
-                                activation_='lrelu',
+                                activation_='relu',
                                 normalization=normalization,
                                 spectral_norm=spectral_norm)
 
         for i in range(1, 6):
             _nb_filter = nb_filter*(2**(5-i))
-            self.convs.append(ConvBlock(_nb_filter,
-                                        kernel_size=(3, 3),
-                                        sampling='same',
-                                        **self.conv_block_params))
             if upsampling == 'subpixel':
                 _nb_filter *= 4
             self.convs.append(ConvBlock(_nb_filter,
-                                        kernel_size=(3, 3),
+                                        kernel_size=(5, 5),
                                         sampling=upsampling,
                                         **self.conv_block_params))
         self.last_conv = ConvBlock(3,
-                                   kernel_size=(1, 1),
+                                   kernel_size=(9, 9),
                                    **self.last_conv_block_params)
 
     def call(self, inputs,

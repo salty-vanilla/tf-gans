@@ -55,9 +55,6 @@ class AnimeDiscriminator64(Discriminator):
             _nb_filter = nb_filter*(2**i)
             self.convs.append(ConvBlock(_nb_filter,
                                         kernel_size=(3, 3),
-                                        **self.conv_block_params))
-            self.convs.append(ConvBlock(_nb_filter,
-                                        kernel_size=(3, 3),
                                         sampling=downsampling,
                                         **self.conv_block_params))
         self.dense = DenseBlock(1, spectral_norm=spectral_norm)
@@ -93,9 +90,6 @@ class AnimeDiscriminator128(Discriminator):
         self.convs = []
         for i in range(6):
             _nb_filter = nb_filter*(2**i)
-            self.convs.append(ConvBlock(_nb_filter,
-                                        kernel_size=(3, 3),
-                                        **self.conv_block_params))
             self.convs.append(ConvBlock(_nb_filter,
                                         kernel_size=(3, 3),
                                         sampling=downsampling,
