@@ -141,7 +141,7 @@ class AnimeGenerator128(Generator):
         return x
 
 
-class AnimeResidualGenerator(Generator):
+class SRResnetGenerator(Generator):
     def __init__(self, latent_dim,
                  nb_filter=64,
                  last_activation='tanh',

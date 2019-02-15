@@ -120,7 +120,7 @@ class AnimeDiscriminator128(Discriminator):
             return x
 
 
-class AnimeResidualDiscriminator(Discriminator):
+class SRResnetDiscriminator(Discriminator):
     def __init__(self, nb_filter=32,
                  normalization='instance',
                  downsampling='stride',

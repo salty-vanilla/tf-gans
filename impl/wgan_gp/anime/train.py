@@ -7,8 +7,8 @@ sys.path.append('../../')
 from solver import Solver
 from datasets.image_sampler import ImageSampler
 from datasets.noise_sampler import NoiseSampler
-from models.generator import AnimeResidualGenerator as Generator
-from models.discriminator import AnimeResidualDiscriminator as Discriminator
+from models.generator import SRResnetGenerator as Generator
+from models.discriminator import SRResnetDiscriminator as Discriminator
 # from models.generator import AnimeGenerator128 as Generator
 # from models.discriminator import AnimeDiscriminator128 as Discriminator
 
