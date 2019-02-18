@@ -182,26 +182,10 @@ class ResidualBlock(tf.keras.Model):
                                None,
                                dilation_rate,
                                sampling,
-                               None,
+                               normalization,
                                spectral_norm,
                                lr_equalization,
                                **conv_params)
-
-        # Normalization
-        if normalization is not None:
-            if normalization == 'batch':
-                self.norm = tf.keras.layers.BatchNormalization()
-            elif normalization == 'layer':
-                self.norm = LayerNorm()
-            elif normalization == 'instance':
-                self.norm = InstanceNorm()
-            elif normalization == 'pixel':
-                self.norm = PixelNorm()
-            else:
-                raise ValueError
-        else:
-            self.norm = None
-
         self.act = activation_
         self.shortcut_conv = tf.keras.layers.Conv2D(filters, (1, 1))
 
@@ -215,9 +199,6 @@ class ResidualBlock(tf.keras.Model):
             x += self.shortcut(self.shortcut_conv(inputs))
         else:
             x += self.shortcut(inputs)
-
-        if self.norm is not None:
-            x = self.norm(x, training=training)
         x = activation(x, self.act)
         return x
 
