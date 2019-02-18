@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.python.keras.preprocessing.image import Iterator
 import os
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 
 
 class ImageSampler:
@@ -19,7 +19,8 @@ class ImageSampler:
              y=None,
              batch_size=32,
              shuffle=True,
-             seed=None):
+             seed=None,
+             is_random_flip=False):
         return ArrayIterator(x,
                              y,
                              target_size=self.target_size,
@@ -28,13 +29,15 @@ class ImageSampler:
                              normalize_mode=self.normalize_mode,
                              shuffle=shuffle,
                              seed=seed,
-                             is_training=self.is_training)
+                             is_training=self.is_training,
+                             is_random_flip=is_random_flip)
 
     def flow_from_directory(self, image_dir,
                             batch_size=32,
                             shuffle=True,
                             seed=None,
-                            nb_sample=None):
+                            nb_sample=None,
+                            is_random_flip=False):
         image_paths = np.array([path for path in get_image_paths(image_dir)])
         if nb_sample is not None:
             image_paths = image_paths[:nb_sample]
@@ -46,13 +49,15 @@ class ImageSampler:
                                  normalize_mode=self.normalize_mode,
                                  shuffle=shuffle,
                                  seed=seed,
-                                 is_training=self.is_training)
+                                 is_training=self.is_training,
+                                 is_random_flip=is_random_flip)
 
     def flow_from_path(self, paths,
                        batch_size=32,
                        shuffle=True,
                        seed=None,
-                       nb_sample=None):
+                       nb_sample=None,
+                       is_random_flip=False):
         if nb_sample is not None:
             image_paths = np.array(paths[:nb_sample])
         else:
@@ -64,19 +69,22 @@ class ImageSampler:
                                  normalize_mode=self.normalize_mode,
                                  shuffle=shuffle,
                                  seed=seed,
-                                 is_training=self.is_training)
+                                 is_training=self.is_training,
+                                 is_random_flip=is_random_flip)
 
     def flow_from_tfrecord(self, file_paths,
                            batch_size=32,
                            shuffle=True,
-                           seed=None):
+                           seed=None,
+                           is_random_flip=False):
         return TFRecordIterator(file_paths,
                                 target_size=self.target_size,
                                 color_mode=self.color_mode,
                                 batch_size=batch_size,
                                 shuffle=shuffle,
                                 seed=seed,
-                                is_training=self.is_training)
+                                is_training=self.is_training,
+                                is_random_flip=is_random_flip)
 
 
 class DirectoryIterator(Iterator):
@@ -87,7 +95,8 @@ class DirectoryIterator(Iterator):
                  normalize_mode,
                  shuffle,
                  seed,
-                 is_training):
+                 is_training,
+                 is_random_flip):
         self.paths = paths
         self.target_size = target_size
         self.color_mode = color_mode
@@ -97,6 +106,7 @@ class DirectoryIterator(Iterator):
         super().__init__(self.nb_sample, batch_size, shuffle, seed)
         self.current_paths = None
         self.is_training = is_training
+        self.is_random_flip = is_random_flip
 
     def __call__(self, *args, **kwargs):
         if self.is_training:
@@ -108,7 +118,10 @@ class DirectoryIterator(Iterator):
         with self.lock:
             index_array = next(self.index_generator)
         image_path_batch = self.paths[index_array]
-        image_batch = np.array([load_image(path, self.target_size, self.color_mode)
+        image_batch = np.array([load_image(path,
+                                           self.target_size,
+                                           self.color_mode,
+                                           self.is_random_flip)
                                 for path in image_path_batch])
         self.current_paths = image_path_batch
         return image_batch
@@ -124,8 +137,10 @@ class DirectoryIterator(Iterator):
         for i in range(steps):
             index_array = indexes[i * self.batch_size: (i + 1) * self.batch_size]
             image_path_batch = self.paths[index_array]
-
-            image_batch = np.array([load_image(path, self.target_size, self.color_mode)
+            image_batch = np.array([load_image(path,
+                                               self.target_size,
+                                               self.color_mode,
+                                               self.is_random_flip)
                                     for path in image_path_batch])
 
             self.current_paths = image_path_batch
@@ -150,7 +165,8 @@ class ArrayIterator(Iterator):
                  normalize_mode,
                  shuffle,
                  seed,
-                 is_training):
+                 is_training,
+                 is_random_flip):
         self.x = x
         self.y = y
         self.target_size = target_size
@@ -160,6 +176,7 @@ class ArrayIterator(Iterator):
         self.normalize_mode = normalize_mode
         super().__init__(self.nb_sample, batch_size, shuffle, seed)
         self.is_training = is_training
+        self.is_random_flip = is_random_flip
 
         if len(self.x.shape) == 4:
             if x.shape[3] == 1:
@@ -176,7 +193,8 @@ class ArrayIterator(Iterator):
             index_array = next(self.index_generator)
         image_batch = np.array([preprocessing(Image.fromarray(x),
                                               color_mode=self.color_mode,
-                                              target_size=self.target_size)
+                                              target_size=self.target_size,
+                                              is_random_flip=self.is_random_flip)
                                 for x in self.x[index_array]])
         if self.y is not None:
             label_batch = self.y[index_array]
@@ -196,7 +214,8 @@ class ArrayIterator(Iterator):
             index_array = indexes[i * self.batch_size: (i + 1) * self.batch_size]
             image_batch = np.array([preprocessing(Image.fromarray(x),
                                                   color_mode=self.color_mode,
-                                                  target_size=self.target_size)
+                                                  target_size=self.target_size,
+                                                  is_random_flip=self.is_random_flip)
                                     for x in self.x[index_array]])
             if self.y is not None:
                 label_batch = self.y[index_array]
@@ -214,12 +233,18 @@ class ArrayIterator(Iterator):
         return self.nb_sample
 
 
-def preprocessing(x, target_size=None, color_mode='rgb'):
+def preprocessing(x,
+                  target_size=None,
+                  color_mode='rgb',
+                  is_random_flip=False):
     assert color_mode in ['grayscale', 'gray', 'rgb']
     if color_mode in ['grayscale', 'gray']:
         image = x.convert('L')
     else:
         image = x
+
+    if is_random_flip and np.random.uniform(0., 1.) > 0.5:
+        image = ImageOps.mirror(image)
 
     if target_size is not None and target_size != image.size:
         image = image.resize(target_size, Image.BILINEAR)
@@ -233,10 +258,16 @@ def preprocessing(x, target_size=None, color_mode='rgb'):
     return image_array
 
 
-def load_image(path, target_size=None, color_mode='rgb'):
+def load_image(path,
+               target_size=None,
+               color_mode='rgb',
+               is_random_flip=False):
     image = Image.open(path)
     try:
-        return preprocessing(image, target_size, color_mode)
+        return preprocessing(image,
+                             target_size,
+                             color_mode,
+                             is_random_flip)
     except:
         print(path)
         exit()
@@ -288,7 +319,8 @@ class TFRecordIterator:
                  batch_size=32,
                  shuffle=True,
                  seed=None,
-                 is_training=True):
+                 is_training=True,
+                 is_random_flip=False):
         self.file_paths = file_paths
         self.nb_sample = 0
         if map_fn is not None:
@@ -300,6 +332,7 @@ class TFRecordIterator:
         self.shuffle = shuffle
         self.seed = seed
         self.is_training = is_training
+        self.is_random_flip = is_random_flip
         self._build_dataset()
 
     def __next__(self):
@@ -333,6 +366,8 @@ class TFRecordIterator:
         images = tf.cast(images, tf.float32)
         images = tf.reshape(images, (height, width, channel))
         images = tf.image.resize_images(images, self._target_size)
+        if self.is_random_flip:
+            images = tf.image.random_flip_left_right(images)
         return (images / 255 - 0.5) / 0.5
 
     def _build_dataset(self):
