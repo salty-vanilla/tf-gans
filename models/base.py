@@ -23,7 +23,7 @@ class Generator(tf.keras.Model):
                                   'normalization': self.normalization,
                                   'spectral_norm': self.spectral_norm}
 
-        self.last_conv_block_params = {'kernel_initializer': 'he_normal',
+        self.last_conv_block_params = {'kernel_initializer': 'glorot_uniform',
                                        'activation_': self.last_activation,
                                        'normalization': None,
                                        'spectral_norm': self.spectral_norm}
