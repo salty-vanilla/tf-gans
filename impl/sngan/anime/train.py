@@ -7,10 +7,10 @@ sys.path.append('../../')
 from solver import Solver
 from datasets.image_sampler import ImageSampler
 from datasets.noise_sampler import NoiseSampler
-from models.generator import SRResnetGenerator as Generator
-from models.discriminator import SRResnetDiscriminator as Discriminator
-# from models.generator import AnimeGenerator128 as Generator
-# from models.discriminator import AnimeDiscriminator128 as Discriminator
+# from models.generator import SRResnetGenerator as Generator
+# from models.discriminator import SRResnetDiscriminator as Discriminator
+from models.generator import AnimeGenerator64 as Generator
+from models.discriminator import AnimeDiscriminator64 as Discriminator
 
 
 def main():
@@ -20,7 +20,7 @@ def main():
     os.makedirs(config['logdir'], exist_ok=True)
     shutil.copy(yml_path, os.path.join(config['logdir'], 'config.yml'))
 
-    image_sampler = ImageSampler(target_size=(128, 128),
+    image_sampler = ImageSampler(target_size=(64, 64),
                                  color_mode='rgb',
                                  is_training=True)
     noise_sampler = NoiseSampler('normal')
