@@ -1,16 +1,16 @@
-logdir: ../../../logs/sngan/anime/debug_4
+logdir: ../../../logs/sngan/anime/debug_13
 records:
   - /home/nakatsuka/workspace/dataset/safebooru/safebooru.tfrecord
-batch_size: 50
+batch_size: 256
 
 generator_params:
   latent_dim: 128
-  upsampling: subpixel
+  upsampling: deconv
   normalization: batch
-  nb_filter: 128
+  nb_filter: 64
 
 discriminator_params:
-  normalization: instance
+  normalization: batch
   nb_filter: 32
   spectral_norm: True
 
