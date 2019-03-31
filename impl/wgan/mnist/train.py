@@ -7,8 +7,8 @@ sys.path.append('../../')
 from solver import Solver
 from datasets.mnist import load_data
 from datasets.noise_sampler import NoiseSampler
-from mnist.generator import Generator
-from mnist.discriminator import Discriminator
+from models.generator import MNISTGenerator as Generator
+from models.discriminator import MNISTDiscriminator as Discriminator
 
 
 def main():
