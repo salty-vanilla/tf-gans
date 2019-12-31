@@ -26,8 +26,8 @@ class Solver(object):
         self.discriminator = discriminator
         self.gp_lambda = gp_lambda
         self.d_norm_eps = d_norm_eps
-        self.opt_g = tf.train.AdamOptimizer(lr_g, beta1=0.5, beta2=0.9)
-        self.opt_d = tf.train.AdamOptimizer(lr_d, beta1=0.5, beta2=0.9)
+        self.opt_g = tf.keras.optimizers.Adam(lr_g, beta_1=0.5, beta_2=0.9)
+        self.opt_d = tf.keras.optimizers.Adam(lr_d, beta_1=0.5, beta_2=0.9)
         self.latent_dim = self.generator.latent_dim
         self.nb_growing = nb_growing
         self.initial_alpha = initial_alpha

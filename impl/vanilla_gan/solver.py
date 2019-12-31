@@ -4,7 +4,6 @@ import sys
 import time
 from PIL import Image
 import numpy as np
-tf.enable_eager_execution()
 sys.path.append('../../')
 from datasets.image_sampler import ImageSampler
 from ops.losses import discriminator_loss, generator_loss, gradient_penalty, discriminator_norm
@@ -18,8 +17,8 @@ class Solver(object):
                  logdir: str = None):
         self.generator = generator
         self.discriminator = discriminator
-        self.opt_g = tf.train.AdamOptimizer(lr_g, beta1=0.5, beta2=0.9)
-        self.opt_d = tf.train.AdamOptimizer(lr_d, beta1=0.5, beta2=0.9)
+        self.opt_g = tf.keras.optimizers.Adam(lr_g, beta_1=0.5, beta_2=0.9)
+        self.opt_d = tf.keras.optimizers.Adam(lr_d, beta_1=0.5, beta_2=0.9)
         self.latent_dim = self.generator.latent_dim
         self.logdir = logdir
 
@@ -30,8 +29,8 @@ class Solver(object):
             d_fake = self.discriminator(gz, training=True)
             loss_d = discriminator_loss(d_real, d_fake, 'JSD')
 
-        grads = tape.gradient(loss_d, self.discriminator.variables)
-        self.opt_d.apply_gradients(zip(grads, self.discriminator.variables))
+        grads = tape.gradient(loss_d, self.discriminator.trainable_weights)
+        self.opt_d.apply_gradients(zip(grads, self.discriminator.trainable_weights))
         return loss_d
 
     def _update_generator(self, z):
@@ -39,8 +38,8 @@ class Solver(object):
             gz = self.generator(z, training=True)
             d_fake = self.discriminator(gz, training=True)
             loss_g = generator_loss(d_fake, 'JSD')
-        grads = tape.gradient(loss_g, self.generator.variables)
-        self.opt_g.apply_gradients(zip(grads, self.generator.variables))
+        grads = tape.gradient(loss_g, self.generator.trainable_weights)
+        self.opt_g.apply_gradients(zip(grads, self.generator.trainable_weights))
         return loss_g
 
     def fit(self, x,

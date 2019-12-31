@@ -225,8 +225,6 @@ class ArrayIterator(Iterator):
 
     def data_to_image(self, x):
         x = np.array(x)
-        if x.shape[-1] == 1:
-            x = x.reshape(x.shape[:-1])
         return denormalize(x, self.normalize_mode)
 
     def __len__(self):
@@ -253,8 +251,8 @@ def preprocessing(x,
 
     image_array = normalize(image_array)
 
-    if color_mode in ['grayscale', 'gray']:
-        image_array = image_array.reshape(image.size[1], image.size[0], 1)
+    if image_array.ndim == 2:
+        image_array = np.expand_dims(image_array, axis=-1)
     return image_array
 
 

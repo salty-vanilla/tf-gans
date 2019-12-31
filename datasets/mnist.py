@@ -1,6 +1,6 @@
 import numpy as np
 from tensorflow.python.keras.datasets import mnist
-from scipy.misc import imresize
+from PIL import Image
 
 
 def load_data(phase='train',
@@ -32,3 +32,10 @@ def load_data(phase='train',
         return x, y
     else:
         return x
+
+
+def imresize(x: np.array, target_size: tuple):
+    x = x.astype('uint8')
+    im = Image.fromarray(x)
+    im = im.resize(target_size, Image.BILINEAR)
+    return np.asarray(im)

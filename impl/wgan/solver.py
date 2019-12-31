@@ -4,7 +4,6 @@ import sys
 import time
 from PIL import Image
 import numpy as np
-tf.enable_eager_execution()
 sys.path.append('../../')
 from datasets.image_sampler import ImageSampler
 from ops.losses import discriminator_loss, generator_loss, gradient_penalty, discriminator_norm
@@ -20,8 +19,8 @@ class Solver(object):
                  logdir: str = None):
         self.generator = generator
         self.discriminator = discriminator
-        self.opt_g = tf.train.AdamOptimizer(lr_g, beta1=0.5, beta2=0.9)
-        self.opt_d = tf.train.AdamOptimizer(lr_d, beta1=0.5, beta2=0.9)
+        self.opt_g = tf.keras.optimizers.Adam(lr_g, beta_1=0.5, beta_2=0.9)
+        self.opt_d = tf.keras.optimizers.Adam(lr_d, beta_1=0.5, beta_2=0.9)
         self.clip_threshold = clip_threshold
         self.d_norm_eps = d_norm_eps
         self.latent_dim = self.generator.latent_dim
@@ -37,14 +36,14 @@ class Solver(object):
             # d_norm = discriminator_norm(d_real)
             # loss_d = loss_d + self.d_norm_eps*d_norm
 
-        grads = tape.gradient(loss_d, self.discriminator.variables)
-        self.opt_d.apply_gradients(zip(grads, self.discriminator.variables))
+        grads = tape.gradient(loss_d, self.discriminator.trainable_weights)
+        self.opt_d.apply_gradients(zip(grads, self.discriminator.trainable_weights))
 
-        for v in self.discriminator.weights:
+        for v in self.discriminator.trainable_weights:
             if 'kernel' in v.name:
-                tf.assign(v, tf.clip_by_value(v,
-                                              -self.clip_threshold,
-                                              self.clip_threshold))
+                v = tf.clip_by_value(v,
+                                     -self.clip_threshold,
+                                     self.clip_threshold)
 
         return loss_d
 
@@ -53,8 +52,8 @@ class Solver(object):
             gz = self.generator(z, training=True)
             d_fake = self.discriminator(gz, training=True)
             loss_g = generator_loss(d_fake, 'WD')
-        grads = tape.gradient(loss_g, self.generator.variables)
-        self.opt_g.apply_gradients(zip(grads, self.generator.variables))
+        grads = tape.gradient(loss_g, self.generator.trainable_weights)
+        self.opt_g.apply_gradients(zip(grads, self.generator.trainable_weights))
         return loss_g
 
     def fit(self, x,
