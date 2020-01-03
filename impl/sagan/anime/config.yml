@@ -1,0 +1,22 @@
+logdir: ../../../logs/sagan/anime/debug13
+records:
+  - /home/van/dataset/safebooru.tfrecord
+batch_size: 32
+
+generator_params:
+  latent_dim: 128
+  upsampling: deconv
+  normalization: batch
+  nb_filter: 32
+
+discriminator_params:
+  normalization: batch
+  nb_filter: 64
+
+solver_params:
+  lr_g: 0.0001
+  lr_d: 0.0004
+
+fit_params:
+  nb_epoch: 100
+  save_steps: 100
