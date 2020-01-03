@@ -351,19 +351,19 @@ class TFRecordIterator:
 
     def map_dataset(self, serialized):
         features = {
-            'height': tf.FixedLenFeature([], tf.int64),
-            'width': tf.FixedLenFeature([], tf.int64),
-            'channel': tf.FixedLenFeature([], tf.int64),
-            'image': tf.FixedLenFeature([], tf.string),
+            'height': tf.io.FixedLenFeature([], tf.int64),
+            'width': tf.io.FixedLenFeature([], tf.int64),
+            'channel': tf.io.FixedLenFeature([], tf.int64),
+            'image': tf.io.FixedLenFeature([], tf.string),
         }
-        features = tf.parse_single_example(serialized, features)
+        features = tf.io.parse_single_example(serialized, features)
         height = tf.cast(features['height'], tf.int32)
         width = tf.cast(features['width'], tf.int32)
         channel = tf.cast(features['channel'], tf.int32)
-        images = tf.decode_raw(features['image'], tf.uint8)
+        images = tf.io.decode_raw(features['image'], tf.uint8)
         images = tf.cast(images, tf.float32)
         images = tf.reshape(images, (height, width, channel))
-        images = tf.image.resize_images(images, self._target_size)
+        images = tf.image.resize(images, self._target_size)
         if self.is_random_flip:
             images = tf.image.random_flip_left_right(images)
         return (images / 255 - 0.5) / 0.5
@@ -375,7 +375,7 @@ class TFRecordIterator:
         if self.shuffle:
             self.dataset = self.dataset.shuffle(buffer_size=256, seed=self.seed)
         self.dataset = self.dataset.batch(self._batch_size)
-        self.iterator = self.dataset.make_one_shot_iterator()
+        self.iterator = self.dataset.__iter__()
 
     def __len__(self):
         if self.nb_sample:
@@ -383,11 +383,9 @@ class TFRecordIterator:
         else:
             print('\nComputing the number of records now.'),
             print('It takes a long time only for the 1st time\n')
-            options = tf.python_io.TFRecordOptions(
-                tf.python_io.TFRecordCompressionType.GZIP) if self.compression_type == 'GZIP' \
-                else None
+            options = tf.io.TFRecordOptions(self.compression_type)
             for path in self.file_paths:
-                self.nb_sample += sum(1 for _ in tf.python_io.tf_record_iterator(path, options=options))
+                self.nb_sample += sum(1 for _ in tf.data.TFRecordDataset(path, compression_type=self.compression_type).batch(1))
         return self.nb_sample
 
     @property
